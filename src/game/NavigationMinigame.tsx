@@ -170,7 +170,7 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
   }, [target, locked, spawnTarget]);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3 flex flex-col h-full">
       <div className="flex items-center justify-between">
         <p className="font-mono text-xs text-coffee-100/60">
           Track each drifting target and hold steady to lock. Lock all
@@ -182,7 +182,7 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
       </div>
       <div
         id="nav-field"
-        className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-to-br from-coffee-900/40 to-black/40"
+        className="relative w-full flex-1 min-h-0 rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-to-br from-coffee-900/40 to-black/40"
         style={{
           backgroundImage:
             'linear-gradient(rgba(196,164,132,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(196,164,132,0.06) 1px, transparent 1px)',

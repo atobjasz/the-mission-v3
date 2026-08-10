@@ -541,10 +541,10 @@ export default function App() {
   return (
     <>
       <Starfield hyperdrive={hyperdrive} />
-      <div className="relative z-10 min-h-screen flex items-center justify-center p-3 sm:p-4">
+      <div className="relative z-10 min-h-screen flex items-center justify-center p-2 sm:p-4">
         <div className="w-full max-w-5xl">
           {/* Status bar */}
-          <div className="flex items-center justify-between mb-3 px-1">
+          <div className="flex items-center justify-between mb-2 sm:mb-3 px-1">
             <div className="flex items-center gap-2">
               <Rocket className="w-4 h-4 text-coffee-300" />
               <span className="font-display text-xs sm:text-sm tracking-widest text-coffee-100">SS STELLAR</span>
@@ -562,7 +562,7 @@ export default function App() {
 
           {/* Two-column layout with shatter animation */}
           <div
-            className={`grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 h-[420px] lg:h-[calc(100vh-200px)] ${
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4 h-[calc(100vh-110px)] lg:h-[calc(100vh-200px)] grid-rows-[140px_1fr] lg:grid-rows-1 ${
               hijackPhase === 'shattering' ? 'shatter-container' : ''
             }`}
           >
@@ -571,8 +571,8 @@ export default function App() {
               <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(74,50,34,0.50) 0%, rgba(46,31,21,0.68) 100%)' }} />
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-coffee-300/40 to-transparent" />
               <div className="absolute left-0 right-0 h-20 pointer-events-none opacity-15" style={{ background: 'linear-gradient(to bottom, transparent, rgba(196,164,132,0.4), transparent)', animation: 'scan-line 6s linear infinite' }} />
-              <div className="relative p-5 sm:p-6 flex flex-col flex-1 min-h-0 overflow-y-auto">
-                <div className="flex items-center justify-between border-b border-coffee-400/15 pb-3">
+              <div className="relative p-3 sm:p-6 flex flex-col flex-1 min-h-0 overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-coffee-400/15 pb-2 sm:pb-3">
                   <div className="flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-coffee-300" />
                     <span className="font-mono text-xs text-coffee-200/60 tracking-wider">FLIGHT-CONSOLE</span>
@@ -584,10 +584,12 @@ export default function App() {
                   </div>
                 </div>
                 {!isComplete && (
-                  <ConsolePanel title={stage.name} subtitle={stage.subtitle} progress={{ current: currentIdx, total: STAGES.length - 1, label: 'Stage' }} />
+                  <div className="hidden sm:block">
+                    <ConsolePanel title={stage.name} subtitle={stage.subtitle} progress={{ current: currentIdx, total: STAGES.length - 1, label: 'Stage' }} />
+                  </div>
                 )}
                 {typedLog.length > 0 && (
-                  <div className="border-t border-coffee-400/15 pt-3 flex flex-col flex-1 min-h-0 mt-4">
+                  <div className="border-t border-coffee-400/15 pt-2 sm:pt-3 flex flex-col flex-1 min-h-0 mt-2 sm:mt-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-mono text-[10px] uppercase tracking-widest text-coffee-200/40">Event Log</span>
                     </div>
@@ -606,8 +608,8 @@ export default function App() {
             <div className={`relative rounded-2xl border border-coffee-400/25 overflow-hidden shadow-2xl shadow-black/60 backdrop-blur-md flex flex-col ${hijackPhase === 'shattering' ? 'shatter-right' : ''}`}>
               <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(74,50,34,0.50) 0%, rgba(46,31,21,0.68) 100%)' }} />
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-coffee-300/40 to-transparent" />
-              <div className="relative p-5 sm:p-6 flex flex-col flex-1 min-h-0 overflow-y-auto">
-                <div className="flex items-center justify-between border-b border-coffee-400/15 pb-3 mb-4">
+              <div className="relative p-3 sm:p-6 flex flex-col flex-1 min-h-0 overflow-y-auto">
+                <div className="flex items-center justify-between border-b border-coffee-400/15 pb-2 sm:pb-3 mb-3 sm:mb-4">
                   <div className="flex items-center gap-2">
                     <Target className="w-4 h-4 text-coffee-300" />
                     <span className="font-mono text-xs text-coffee-200/60 tracking-wider">{isComplete ? 'MISSION REPORT' : 'ACTIVE MISSION'}</span>
@@ -618,7 +620,7 @@ export default function App() {
                     <div className={`w-2 h-2 rounded-full ${isComplete ? 'bg-emerald-400/70' : 'bg-amber-400/60 animate-pulse'}`} />
                   </div>
                 </div>
-                <div className="min-h-0">
+                <div className="min-h-0 flex-1 flex flex-col">
                   {renderMinigame()}
                   {isComplete && (
                     <div className="space-y-5 animate-fade-in">

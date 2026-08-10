@@ -245,7 +245,7 @@ export default function AsteroidMinigame({ onComplete, onAbort }: Props) {
   }, [endGame]);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3 flex flex-col h-full">
       <div className="flex items-center justify-between font-mono text-xs">
         <span className="text-coffee-100/70">Score: <span className="text-emerald-300 font-bold">{score}</span></span>
         <span className="text-coffee-100/70">Time: <span className={timeLeft <= 5 ? 'text-red-400 font-bold' : 'text-coffee-100'}>{timeLeft}s</span></span>
@@ -253,7 +253,7 @@ export default function AsteroidMinigame({ onComplete, onAbort }: Props) {
       </div>
 
       <div
-        className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-radial from-coffee-900/30 to-black/50"
+        className="relative w-full flex-1 min-h-0 rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-radial from-coffee-900/30 to-black/50"
         style={{
           backgroundImage:
             'linear-gradient(rgba(196,164,132,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(196,164,132,0.07) 1px, transparent 1px), radial-gradient(circle at 50% 50%, rgba(196,164,132,0.08) 0%, transparent 60%)',

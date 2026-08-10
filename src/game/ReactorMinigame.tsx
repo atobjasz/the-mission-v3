@@ -142,14 +142,14 @@ export default function ReactorMinigame({ onComplete, onAbort }: Props) {
             : `Round ${visibleLen} — repeat the sequence (${inputIndex} / ${visibleLen})`;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3 flex flex-col h-full">
       <div className="flex items-center justify-between">
         <p className="font-mono text-xs text-coffee-100/60">{phaseLabel}</p>
         <span className="font-mono text-[11px] text-coffee-200/40">
           Round {Math.min(visibleLen, TARGET_LENGTH)} / {TARGET_LENGTH}
         </span>
       </div>
-      <div className="grid grid-cols-3 gap-2 sm:gap-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 flex-1 min-h-0 content-center">
         {Array.from({ length: NUM_TILES }, (_, i) => {
           const isActive = activeTile === i;
           const canPress = phase === 'input';
@@ -161,8 +161,9 @@ export default function ReactorMinigame({ onComplete, onAbort }: Props) {
               onClick={() => handlePress(i)}
               disabled={!canPress}
               className={`
-                relative aspect-square rounded-xl font-display font-bold text-2xl sm:text-3xl
+                relative rounded-xl font-display font-bold text-2xl sm:text-3xl
                 transition-all duration-150 select-none flex items-center justify-center
+                w-full h-full min-h-0
                 ${isActive ? 'scale-105 shadow-lg' : canPress ? 'hover:scale-105 cursor-pointer' : 'cursor-default'}
               `}
               style={{
