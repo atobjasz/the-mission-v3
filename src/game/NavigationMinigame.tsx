@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { sfx } from '@/game/sound';
 
 type Props = {
-  onComplete: (time: number) => void;
+  onComplete: (points: number, time: number) => void;
   onAbort: () => void;
 };
 
@@ -110,7 +110,8 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
                 completedRef.current = true;
                 setLocked(true);
                 const elapsed = Date.now() - startTimeRef.current;
-                setTimeout(() => onCompleteRef.current(elapsed), 600);
+                const points = count * 2;
+                setTimeout(() => onCompleteRef.current(points, elapsed), 600);
               }
               return 100;
             }
@@ -144,7 +145,9 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
         setLocked(true);
         setLockProgress(100);
         const elapsed = Date.now() - startTimeRef.current;
-        setTimeout(() => onCompleteRef.current(elapsed), 600);
+        setLockProgress(100);
+        const points = count * 2;
+        setTimeout(() => onCompleteRef.current(points, elapsed), 600);
       } else {
         lockedCountRef.current = count;
         setLockedCount(count);

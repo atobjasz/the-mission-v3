@@ -169,10 +169,10 @@ export default function App() {
   );
 
   const handleNavComplete = useCallback(
-    (time: number) => {
+    (points: number, time: number) => {
       const seconds = (time / 1000).toFixed(1);
-      setScores((s) => [...s, { stage: 'navigation', metric: Math.round(time), unit: 'ms' }]);
-      addLog(`Coordinates locked in ${seconds}s. Jump vector confirmed.`, 'success');
+      setScores((s) => [...s, { stage: 'navigation', metric: points, unit: 'pts' }]);
+      addLog(`Coordinates locked in ${seconds}s — ${points} pts. Jump vector confirmed.`, 'success');
       sfx.navLocked();
       addLog('Something ahead — asteroid field detected!', 'alert');
       jumpToStage('asteroids', [
@@ -297,7 +297,7 @@ export default function App() {
     if (id === 'complete' || id === 'hijack' || id === 'hijack-intro' || id === 'quiz' || id === 'post-quiz' || id === 'connections' || id === 'wordle' || id === 'post-wordle' || id === 'timeline' || id === 'reveal' || id === 'proposal') {
       setScores([
         { stage: 'reactor', metric: 4200, unit: 'ms' },
-        { stage: 'navigation', metric: 11000, unit: 'ms' },
+        { stage: 'navigation', metric: 8, unit: 'pts' },
         { stage: 'asteroids', metric: 75, unit: 'shield' },
       ]);
     }
@@ -629,7 +629,7 @@ export default function App() {
                             {scores.map((s, i) => {
                               const st = STAGES.find((st) => st.id === s.stage);
                               if (!st) return null;
-                              const display = s.unit === 'ms' ? `${(s.metric / 1000).toFixed(1)}s` : s.unit === 'shield' ? `${s.metric}%` : `${s.metric}%`;
+                              const display = s.unit === 'ms' ? `${(s.metric / 1000).toFixed(1)}s` : s.unit === 'shield' ? `${s.metric}%` : s.unit === 'pts' ? `${s.metric} pts` : `${s.metric}%`;
                               return (
                                 <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg bg-coffee-700/30 border border-coffee-400/10">
                                   <span className="font-mono text-xs text-coffee-100/70">{st.name}</span>
