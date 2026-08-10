@@ -30,13 +30,14 @@ function ExplosionBurst({ x, y, size }: { x: number; y: number; size: number }) 
     return () => cancelAnimationFrame(r);
   }, []);
 
-  const particles = Array.from({ length: 8 }, (_, i) => {
-    const angle = (i / 8) * Math.PI * 2;
-    const dist = size * 1.4;
+  const particles = Array.from({ length: 12 }, (_, i) => {
+    const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
+    const dist = size * (1.2 + Math.random() * 0.8);
     return {
       dx: Math.cos(angle) * dist,
       dy: Math.sin(angle) * dist,
       color: PARTICLE_COLORS[i % PARTICLE_COLORS.length],
+      sz: size * (0.25 + Math.random() * 0.25),
     };
   });
 
@@ -45,37 +46,50 @@ function ExplosionBurst({ x, y, size }: { x: number; y: number; size: number }) 
       className="absolute pointer-events-none"
       style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}
     >
+      <span
+        className="absolute rounded-full border-2 border-amber-400/80"
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          left: 0,
+          top: 0,
+          transform: fired
+            ? 'translate(-50%, -50%) scale(3)'
+            : 'translate(-50%, -50%) scale(0.5)',
+          opacity: fired ? 0 : 0.9,
+          transition: 'transform 0.5s ease-out, opacity 0.5s ease-out',
+        }}
+      />
       {particles.map((p, i) => (
         <span
           key={i}
           className="absolute rounded-full"
           style={{
-            width: `${size * 0.4}px`,
-            height: `${size * 0.4}px`,
+            width: `${p.sz}px`,
+            height: `${p.sz}px`,
             left: 0,
             top: 0,
             background: p.color,
-            boxShadow: `0 0 8px ${p.color}`,
+            boxShadow: `0 0 10px ${p.color}`,
             transform: fired
-              ? `translate(-50%, -50%) translate(${p.dx}px, ${p.dy}px) scale(0.2)`
-              : 'translate(-50%, -50%) translate(0px, 0px) scale(1)',
+              ? `translate(-50%, -50%) translate(${p.dx}px, ${p.dy}px) scale(0.1)`
+              : 'translate(-50%, -50%) scale(1)',
             opacity: fired ? 0 : 1,
-            transition: 'transform 0.5s ease-out, opacity 0.5s ease-out',
+            transition: 'transform 0.6s ease-out, opacity 0.6s ease-out',
           }}
         />
       ))}
       <span
         className="absolute rounded-full"
         style={{
-          width: `${size}px`,
-          height: `${size}px`,
+          width: `${size * 1.3}px`,
+          height: `${size * 1.3}px`,
           left: 0,
           top: 0,
-          transform: 'translate(-50%, -50%)',
-          background: 'radial-gradient(circle, rgba(251,191,36,0.9) 0%, rgba(239,68,68,0.5) 50%, transparent 70%)',
+          background: 'radial-gradient(circle, rgba(255,235,150,1) 0%, rgba(251,191,36,0.8) 30%, rgba(239,68,68,0.4) 60%, transparent 75%)',
           opacity: fired ? 0 : 1,
-          transition: 'opacity 0.45s ease-out, transform 0.45s ease-out',
-          ...(fired ? { transform: 'translate(-50%, -50%) scale(2)', opacity: 0 } : {}),
+          transition: 'opacity 0.35s ease-out, transform 0.35s ease-out',
+          ...(fired ? { transform: 'translate(-50%, -50%) scale(2.5)' } : { transform: 'translate(-50%, -50%) scale(0.8)' }),
         }}
       />
     </div>
@@ -91,12 +105,19 @@ let nextId = 0;
 
 function spawnAsteroid(): Asteroid {
   const side = Math.floor(Math.random() * 4);
-  let x = 0, y = 0, vx = 0, vy = 0;
-  const speed = 0.04 + Math.random() * 0.05;
-  if (side === 0) { x = Math.random() * 100; y = -5; vx = (Math.random() - 0.5) * 0.03; vy = speed; }
-  else if (side === 1) { x = 105; y = Math.random() * 100; vx = -speed; vy = (Math.random() - 0.5) * 0.03; }
-  else if (side === 2) { x = Math.random() * 100; y = 105; vx = (Math.random() - 0.5) * 0.03; vy = -speed; }
-  else { x = -5; y = Math.random() * 100; vx = speed; vy = (Math.random() - 0.5) * 0.03; }
+  let x = 0, y = 0;
+  if (side === 0) { x = Math.random() * 100; y = -5; }
+  else if (side === 1) { x = 105; y = Math.random() * 100; }
+  else if (side === 2) { x = Math.random() * 100; y = 105; }
+  else { x = -5; y = Math.random() * 100; }
+  // Aim toward ship at center (50,50) with slight scatter
+  const dx = 50 - x;
+  const dy = 50 - y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const speed = 0.05 + Math.random() * 0.05;
+  const jitter = (Math.random() - 0.5) * 0.02;
+  const vx = (dx / dist) * speed + jitter;
+  const vy = (dy / dist) * speed + jitter;
   const size = 18 + Math.random() * 22;
   return { id: nextId++, x, y, vx, vy, size, hp: Math.ceil(size / 16) };
 }
@@ -185,15 +206,17 @@ export default function AsteroidMinigame({ onComplete, onAbort }: Props) {
       }
       return survivors;
     });
-    sfx.asteroidDestroy();
     setScore((s) => s + 10);
     if (destroyed) {
       const d: Asteroid = destroyed;
+      sfx.asteroidDestroy();
       const ex: Explosion = { id: nextExplosionId++, x: d.x, y: d.y, size: d.size, born: performance.now() };
       setExplosions((prev) => [...prev, ex]);
       setTimeout(() => {
         setExplosions((prev) => prev.filter((p) => p.id !== ex.id));
-      }, 600);
+      }, 700);
+    } else {
+      sfx.asteroidHit();
     }
   }, []);
 

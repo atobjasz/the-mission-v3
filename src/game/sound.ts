@@ -200,7 +200,8 @@ export const sfx = {
   navLocking: () => beep(660, 0.06, 'sine', 0.15),
   navLocked: () => chime([784, 988, 1319], 0.5, 0.22),
 
-  asteroidDestroy: () => explosion(0.3),
+  asteroidDestroy: () => explosion(0.35),
+  asteroidHit: () => beep(220, 0.05, 'square', 0.15),
   asteroidHitShield: () => buzz(80, 0.2, 0.3),
   asteroidTimerTick: () => beep(1200, 0.04, 'square', 0.15),
   asteroidComplete: () => chime([523, 659, 784], 0.5, 0.22),

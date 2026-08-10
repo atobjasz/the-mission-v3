@@ -11,14 +11,6 @@ type Props = {
 export default function ProposalSequence({ onComplete }: Props) {
   const [phase, setPhase] = useState<Phase>('choose');
 
-  useEffect(() => {
-    if (phase !== 'hug' || document.querySelector('script[src="https://tenor.com/embed.js"]')) return;
-    const script = document.createElement('script');
-    script.src = 'https://tenor.com/embed.js';
-    script.async = true;
-    document.body.appendChild(script);
-  }, [phase]);
-
   const chooseYes = () => {
     sfx.success();
     setPhase('yes');
@@ -72,17 +64,14 @@ export default function ProposalSequence({ onComplete }: Props) {
             A HUG FOR YOU
           </h3>
           <div className="relative border-2 border-pink-300/30 overflow-hidden crt-scanlines mb-5 bg-black/20">
-            <div
-              className="tenor-gif-embed min-h-64"
-              data-postid="16899029469483761674"
-              data-share-method="host"
-              data-aspect-ratio="1"
-              data-width="100%"
-            >
-              <a href="https://tenor.com/view/cat-kiss-catkiss-cat-kiss-cat-kissing-gif-16899029469483761674">
-                Cat Kiss GIF
-              </a>{' '}from <a href="https://tenor.com/search/cat-gifs">Cat GIFs</a>
-            </div>
+            <img
+              src="/cat-kiss.gif"
+              alt="A cat giving a kiss"
+              className="w-full h-auto object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
           </div>
           <p className="font-mono text-sm text-pink-100/90 italic mb-6">
             ...how about now?

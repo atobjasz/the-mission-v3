@@ -35,7 +35,7 @@ type ScoreRecord = {
 };
 
 const HYPERDRIVE_DURATION = 2600;
-const HIJACK_DELAY = 10000; // 10 seconds after mission complete
+const HIJACK_DELAY = 5000; // 5 seconds after mission complete
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('title');
@@ -85,8 +85,8 @@ export default function App() {
       hijackTimerRef.current = setTimeout(() => {
         setCurrentStage('hijack-intro');
         setHijackPhase('idle');
-      }, 1800);
-    }, 2500);
+      }, 1200);
+    }, 1500);
   }, []);
 
   // Start hijack timer when mission complete screen shows
