@@ -24,28 +24,24 @@ let nextExplosionId = 0;
 const PARTICLE_COLORS = ['#f59e0b', '#ef4444', '#fbbf24', '#f97316'];
 
 function ExplosionBurst({ x, y, size }: { x: number; y: number; size: number }) {
-  const [fired, setFired] = useState(false);
-  useEffect(() => {
-    const r = requestAnimationFrame(() => setFired(true));
-    return () => cancelAnimationFrame(r);
-  }, []);
-
   const particles = Array.from({ length: 12 }, (_, i) => {
-    const angle = (i / 12) * Math.PI * 2 + Math.random() * 0.3;
-    const dist = size * (1.2 + Math.random() * 0.8);
+    const angle = (i / 12) * Math.PI * 2 + (i * 0.731) % 0.5;
+    const dist = size * (1.2 + ((i * 0.37) % 0.8));
     return {
       dx: Math.cos(angle) * dist,
       dy: Math.sin(angle) * dist,
       color: PARTICLE_COLORS[i % PARTICLE_COLORS.length],
-      sz: size * (0.25 + Math.random() * 0.25),
+      sz: size * (0.25 + ((i * 0.41) % 0.25)),
+      delay: (i * 16) % 80,
     };
   });
 
   return (
     <div
       className="absolute pointer-events-none"
-      style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}
+      style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)', zIndex: 60 }}
     >
+      {/* Shockwave ring */}
       <span
         className="absolute rounded-full border-2 border-amber-400/80"
         style={{
@@ -53,13 +49,12 @@ function ExplosionBurst({ x, y, size }: { x: number; y: number; size: number }) 
           height: `${size}px`,
           left: 0,
           top: 0,
-          transform: fired
-            ? 'translate(-50%, -50%) scale(3)'
-            : 'translate(-50%, -50%) scale(0.5)',
-          opacity: fired ? 0 : 0.9,
-          transition: 'transform 0.5s ease-out, opacity 0.5s ease-out',
+          marginLeft: `-${size / 2}px`,
+          marginTop: `-${size / 2}px`,
+          animation: 'explosion-ring 0.5s ease-out forwards',
         }}
       />
+      {/* Particles */}
       {particles.map((p, i) => (
         <span
           key={i}
@@ -71,14 +66,13 @@ function ExplosionBurst({ x, y, size }: { x: number; y: number; size: number }) 
             top: 0,
             background: p.color,
             boxShadow: `0 0 10px ${p.color}`,
-            transform: fired
-              ? `translate(-50%, -50%) translate(${p.dx}px, ${p.dy}px) scale(0.1)`
-              : 'translate(-50%, -50%) scale(1)',
-            opacity: fired ? 0 : 1,
-            transition: 'transform 0.6s ease-out, opacity 0.6s ease-out',
+            ['--dx' as string]: `${p.dx}px`,
+            ['--dy' as string]: `${p.dy}px`,
+            animation: `explosion-particle 0.6s ease-out ${p.delay}ms forwards`,
           }}
         />
       ))}
+      {/* Flash core */}
       <span
         className="absolute rounded-full"
         style={{
@@ -86,10 +80,10 @@ function ExplosionBurst({ x, y, size }: { x: number; y: number; size: number }) 
           height: `${size * 1.3}px`,
           left: 0,
           top: 0,
+          marginLeft: `-${(size * 1.3) / 2}px`,
+          marginTop: `-${(size * 1.3) / 2}px`,
           background: 'radial-gradient(circle, rgba(255,235,150,1) 0%, rgba(251,191,36,0.8) 30%, rgba(239,68,68,0.4) 60%, transparent 75%)',
-          opacity: fired ? 0 : 1,
-          transition: 'opacity 0.35s ease-out, transform 0.35s ease-out',
-          ...(fired ? { transform: 'translate(-50%, -50%) scale(2.5)' } : { transform: 'translate(-50%, -50%) scale(0.8)' }),
+          animation: 'explosion-flash 0.35s ease-out forwards',
         }}
       />
     </div>
@@ -193,24 +187,24 @@ export default function AsteroidMinigame({ onComplete, onAbort }: Props) {
   const handleHit = useCallback((id: number, e: React.MouseEvent) => {
     e.stopPropagation();
     if (finishedRef.current) return;
-    let destroyed: Asteroid | null = null;
+    const ast = asteroidsRef.current.find((a) => a.id === id);
+    if (!ast) return;
+    const isDestroyed = ast.hp - 1 <= 0;
     setAsteroids((a) => {
       const survivors: Asteroid[] = [];
-      for (const ast of a) {
-        if (ast.id === id) {
-          if (ast.hp - 1 <= 0) (destroyed as Asteroid | null) = ast;
-          else survivors.push({ ...ast, hp: ast.hp - 1 });
+      for (const item of a) {
+        if (item.id === id) {
+          if (item.hp - 1 > 0) survivors.push({ ...item, hp: item.hp - 1 });
         } else {
-          survivors.push(ast);
+          survivors.push(item);
         }
       }
       return survivors;
     });
     setScore((s) => s + 10);
-    if (destroyed) {
-      const d: Asteroid = destroyed;
+    if (isDestroyed) {
       sfx.asteroidDestroy();
-      const ex: Explosion = { id: nextExplosionId++, x: d.x, y: d.y, size: d.size, born: performance.now() };
+      const ex: Explosion = { id: nextExplosionId++, x: ast.x, y: ast.y, size: ast.size, born: performance.now() };
       setExplosions((prev) => [...prev, ex]);
       setTimeout(() => {
         setExplosions((prev) => prev.filter((p) => p.id !== ex.id));
@@ -262,7 +256,8 @@ export default function AsteroidMinigame({ onComplete, onAbort }: Props) {
         className="relative w-full aspect-[16/10] rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-radial from-coffee-900/30 to-black/50"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 50% 50%, rgba(196,164,132,0.08) 0%, transparent 60%)',
+            'linear-gradient(rgba(196,164,132,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(196,164,132,0.07) 1px, transparent 1px), radial-gradient(circle at 50% 50%, rgba(196,164,132,0.08) 0%, transparent 60%)',
+          backgroundSize: '10% 10%, 10% 10%, 100% 100%',
         }}
       >
         {/* Ship in center */}
@@ -279,9 +274,11 @@ export default function AsteroidMinigame({ onComplete, onAbort }: Props) {
         </div>
 
         {/* Explosions */}
-        {explosions.map((ex) => (
-          <ExplosionBurst key={ex.id} x={ex.x} y={ex.y} size={ex.size} />
-        ))}
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 50 }}>
+          {explosions.map((ex) => (
+            <ExplosionBurst key={ex.id} x={ex.x} y={ex.y} size={ex.size} />
+          ))}
+        </div>
 
         {/* Asteroids */}
         {asteroids.map((ast) => (

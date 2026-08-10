@@ -20,7 +20,7 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
     y: 25 + Math.random() * 50,
     id: 0,
   }));
-  const [cursor, setCursor] = useState({ x: 50, y: 50 });
+  const [inZone, setInZone] = useState(false);
   const [lockProgress, setLockProgress] = useState(0); // 0–100
   const [locked, setLocked] = useState(false);
   const [lockedCount, setLockedCount] = useState(0);
@@ -28,11 +28,12 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
   const startTimeRef = useRef(Date.now());
   const onCompleteRef = useRef(onComplete);
   useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
-  // Refs for the drift + lock interval so it always sees fresh values
+
   const targetRef = useRef(target);
   useEffect(() => { targetRef.current = target; }, [target]);
-  const cursorRef = useRef(cursor);
-  useEffect(() => { cursorRef.current = cursor; }, [cursor]);
+  const cursorRef = useRef({ x: 50, y: 50 });
+  const reticleRef = useRef<HTMLDivElement>(null);
+  const inZoneRef = useRef(false);
   const lockedRef = useRef(locked);
   useEffect(() => { lockedRef.current = locked; }, [locked]);
   const completedRef = useRef(false);
@@ -45,7 +46,7 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
     id,
   }), []);
 
-  // Track cursor position across the entire nav field
+  // Track cursor position directly via DOM — no React re-render per mouse move
   useEffect(() => {
     const onMove = (e: PointerEvent) => {
       const el = document.getElementById('nav-field');
@@ -53,7 +54,19 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
       const rect = el.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
-      setCursor({ x, y });
+      cursorRef.current = { x, y };
+      if (reticleRef.current) {
+        reticleRef.current.style.left = `${x}%`;
+        reticleRef.current.style.top = `${y}%`;
+      }
+      // Only trigger a re-render when zone-entry status changes
+      const dx = x - targetRef.current.x;
+      const dy = y - targetRef.current.y;
+      const inside = Math.sqrt(dx * dx + dy * dy) < LOCK_ZONE;
+      if (inside !== inZoneRef.current) {
+        inZoneRef.current = inside;
+        setInZone(inside);
+      }
     };
     const el = document.getElementById('nav-field');
     el?.addEventListener('pointermove', onMove);
@@ -77,6 +90,13 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
       const dx = cursorRef.current.x - targetRef.current.x;
       const dy = cursorRef.current.y - targetRef.current.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
+
+      // Update inZone status after target drift
+      const inside = dist < LOCK_ZONE;
+      if (inside !== inZoneRef.current) {
+        inZoneRef.current = inside;
+        setInZone(inside);
+      }
 
       setLockProgress((p) => {
         if (dist < LOCK_ZONE) {
@@ -108,13 +128,13 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
       });
     }, DRIFT_INTERVAL);
     return () => clearInterval(t);
-  }, []);
+  }, [spawnTarget]);
 
   // Manual lock button — still works but requires being close
   const handleLockClick = useCallback(() => {
     if (locked) return;
-    const dx = cursor.x - target.x;
-    const dy = cursor.y - target.y;
+    const dx = cursorRef.current.x - target.x;
+    const dy = cursorRef.current.y - target.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < 12 && !completedRef.current) {
       const count = lockedCount + 1;
@@ -134,11 +154,7 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
     } else {
       setAttempts((a) => a + 1);
     }
-  }, [cursor, target, locked, lockedCount]);
-
-  const inZone = Math.sqrt(
-    (cursor.x - target.x) ** 2 + (cursor.y - target.y) ** 2,
-  ) < LOCK_ZONE;
+  }, [target, locked, lockedCount, spawnTarget]);
 
   return (
     <div className="space-y-3">
@@ -178,12 +194,13 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
           </div>
         </div>
 
-        {/* Cursor reticle */}
+        {/* Cursor reticle — positioned directly via DOM ref, no React re-render */}
         <div
-          className="absolute pointer-events-none transition-all duration-75"
+          ref={reticleRef}
+          className="absolute pointer-events-none"
           style={{
-            left: `${cursor.x}%`,
-            top: `${cursor.y}%`,
+            left: '50%',
+            top: '50%',
             transform: 'translate(-50%, -50%)',
           }}
         >
