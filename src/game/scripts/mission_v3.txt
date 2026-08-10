@@ -1,0 +1,109 @@
+*systems hijacked*
+
+??? - I HAVE HIJACKED YOUR SHIP MWAHAHHAHAHAHHAHA
+Gursharan - What?? Why?? You're being mean :(
+??? - Oh my bad... :(
+??? - JUST KIDDING MWAHAHHAHAHA
+??? - If you want to carry on you're going to have to beat a few of my challenges...
+Gursharan - ughhhh boringgggg
+
+*we move to stage 1 of the ???'s challenges
+stage 1 is a mini multiple choice quiz.
+
+question: Which planet in Interstellar has huge waves?
+options:
+Miller (correct)
+Mann
+Earth
+
+question: What format should you watch Christopher Nolan's The Odyssey in?
+options:
+70mm IMax
+IMax
+Samsung Smart Fridge (correct)
+
+question: Which of these are most likely to kill you?
+options:
+A shark attack
+A Leo attack (correct)
+A fly entering your mouth
+
+question: What was the name of the planet where Rocky and Grace went fishing?
+Adrian (correct)
+Adam
+Erid
+
+question: Who is the goat?
+Antoni
+Antoni
+Antoni
+(all of these are correct)
+
+make sure you count up the score. and between each question make sure to say if the answer was correct and if it wasn't tell the user what the right answer was. add a "next" button after each question so the user can take their time to make check their answer*
+
+(if all answers correct)
+??? - Wow you're so smart!!! well done!!!!!
+
+(if any wrong answers)
+??? - These were easy questions come on now...
+??? - Fine I'll let you pass just this once...
+
+
+Gursharan - okay fine cool was that everything??? and who are you???
+??? - No of course it wasn't smh. And you'll find out who you're talking to soon enough.
+Gursharan - okay whatever let's just get it over with
+??? - Patience is a virtue sweetheart.
+??? - Let's move to our next task!!!
+
+
+*now we have stage 2 of ???'s tasks
+this one is a little game in the style of the NYT daily puzzle connections
+
+here are the 4 categories
+
+Interstellar: Cooper, Murph, TARS, CASE
+You: Leo, Reeses, Palworld, Concerts
+Space: Stars, Black hole, Gravity, Time
+Yum! : Sushi, McNuggets, Matcha, McFlurry
+
+next we will have the next step of stage 2 after the user hits the next button
+
+this is going to be a custom wordle game with the word being "cutie"
+
+after the user completes or fails the wordle, they should get a congratulations message or a nice try message whilst revealing the word.
+then there should be a next button for the user to carry on to the dialogue*
+
+??? -  So you've passed all my challenges.
+Gursharan - UGHHH FINALLY THAT TOOK LONGER THAN HARLEEN IN THE SHOWER
+Gursharan - so when do I get to find out who you are?
+??? - In just a second...
+
+*At this point the colour theme should move to a light pink colour*
+
+*Now we move to a little timeline carousel sort of section which will look sort of like this:
+"it started with our group gaming sessions..."
+(screenshots/images of video games which I will attach)
+
+"and then we connected over music and school"
+(pictures of music artists which I will attach)
+
+"and then we had a group hangout"
+(group picture from our group hangout)
+
+"and then we went on a date"
+(pictures from our date, holding hands, hugging together, sushi date, lego)*
+
+*at this point ???'s identity is revealed*
+
+Gursharan - ANTONI ITS BEEN YOU ALL ALONG?!??!
+Antoni - oopsies I guess its me 
+Antoni - but now I have a really important question for you...
+Antoni - you've gone through this whole mission and you have showed resilience!
+Antoni - So now would you like to start a new mission together... And let me be your boyfriend?
+
+*now the user has to choose between two buttons, "YES!" and "I need a hug first" 
+ If the user chooses "I need a hug first" play this GIF https://tenor.com/uivTGDVkgAM.gif
+and then asks the user again, but both options are "YES!"
+Once the user picks "YES!" they get to a "end of mission and start of a new one" screen"
+
+
