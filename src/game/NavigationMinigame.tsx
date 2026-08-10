@@ -38,6 +38,7 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
   useEffect(() => { lockedRef.current = locked; }, [locked]);
   const completedRef = useRef(false);
   const lockedCountRef = useRef(0);
+  const lockProgressRef = useRef(0);
   useEffect(() => { lockedCountRef.current = lockedCount; }, [lockedCount]);
 
   const spawnTarget = useCallback((id: number): Target => ({
@@ -74,90 +75,99 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
   }, []);
 
   // Drift + lock loop: target wanders slightly, lock progress accrues while
-  // the reticle stays inside the zone and decays when it leaves
+  // the reticle stays inside the zone and decays when it leaves.
+  // All side effects live in the interval body — never inside setState updaters,
+  // which React StrictMode double-invokes in dev.
   useEffect(() => {
     const t = setInterval(() => {
-      if (lockedRef.current) return;
+      if (lockedRef.current || completedRef.current) return;
 
       // Drift target in a random walk, clamped to the field
-      setTarget((tg) => {
-        const nx = Math.max(12, Math.min(88, tg.x + (Math.random() - 0.5) * DRIFT_SPEED * 2));
-        const ny = Math.max(12, Math.min(88, tg.y + (Math.random() - 0.5) * DRIFT_SPEED * 2));
-        return { ...tg, x: nx, y: ny };
-      });
+      const nx = Math.max(12, Math.min(88, targetRef.current.x + (Math.random() - 0.5) * DRIFT_SPEED * 2));
+      const ny = Math.max(12, Math.min(88, targetRef.current.y + (Math.random() - 0.5) * DRIFT_SPEED * 2));
+      setTarget((tg) => ({ ...tg, x: nx, y: ny }));
+      targetRef.current = { ...targetRef.current, x: nx, y: ny };
 
       // Evaluate lock using the latest cursor vs latest target
-      const dx = cursorRef.current.x - targetRef.current.x;
-      const dy = cursorRef.current.y - targetRef.current.y;
+      const dx = cursorRef.current.x - nx;
+      const dy = cursorRef.current.y - ny;
       const dist = Math.sqrt(dx * dx + dy * dy);
-
-      // Update inZone status after target drift
       const inside = dist < LOCK_ZONE;
+
       if (inside !== inZoneRef.current) {
         inZoneRef.current = inside;
         setInZone(inside);
       }
 
-      setLockProgress((p) => {
-        if (dist < LOCK_ZONE) {
-          if (p === 0) sfx.navTracking();
-          const next = p + (DRIFT_INTERVAL / LOCK_TIME) * 100;
-          if (next >= 100) {
-            const count = lockedCountRef.current + 1;
-            sfx.navLocked();
-            if (count >= TOTAL_TARGETS) {
-              if (!completedRef.current) {
-                completedRef.current = true;
-                setLocked(true);
-                const elapsed = Date.now() - startTimeRef.current;
-                const points = count * 2;
-                setTimeout(() => onCompleteRef.current(points, elapsed), 600);
-              }
-              return 100;
-            }
-            // Cycle to next target
+      if (inside) {
+        if (lockProgressRef.current === 0) sfx.navTracking();
+        const next = lockProgressRef.current + (DRIFT_INTERVAL / LOCK_TIME) * 100;
+        if (next >= 100) {
+          const count = lockedCountRef.current + 1;
+          sfx.navLocked();
+          if (count >= TOTAL_TARGETS) {
+            completedRef.current = true;
+            lockedRef.current = true;
+            setLocked(true);
+            lockProgressRef.current = 100;
+            setLockProgress(100);
+            const elapsed = Date.now() - startTimeRef.current;
+            const points = count * 2;
+            setTimeout(() => onCompleteRef.current(points, elapsed), 600);
+          } else {
             lockedCountRef.current = count;
             setLockedCount(count);
+            lockProgressRef.current = 0;
             setLockProgress(0);
-            setTarget(spawnTarget(count));
-            return 0;
+            const newTarget = spawnTarget(count);
+            setTarget(newTarget);
+            targetRef.current = newTarget;
           }
-          return next;
+        } else {
+          lockProgressRef.current = next;
+          setLockProgress(next);
         }
+      } else {
         // Decay when out of zone
-        return Math.max(0, p - (DRIFT_INTERVAL / LOCK_TIME) * 150);
-      });
+        const decayed = Math.max(0, lockProgressRef.current - (DRIFT_INTERVAL / LOCK_TIME) * 150);
+        lockProgressRef.current = decayed;
+        setLockProgress(decayed);
+      }
     }, DRIFT_INTERVAL);
     return () => clearInterval(t);
   }, [spawnTarget]);
 
   // Manual lock button — still works but requires being close
   const handleLockClick = useCallback(() => {
-    if (locked) return;
+    if (locked || completedRef.current) return;
     const dx = cursorRef.current.x - target.x;
     const dy = cursorRef.current.y - target.y;
     const dist = Math.sqrt(dx * dx + dy * dy);
-    if (dist < 12 && !completedRef.current) {
-      const count = lockedCount + 1;
+    if (dist < 12) {
+      const count = lockedCountRef.current + 1;
       sfx.navLocked();
       if (count >= TOTAL_TARGETS) {
         completedRef.current = true;
+        lockedRef.current = true;
         setLocked(true);
+        lockProgressRef.current = 100;
         setLockProgress(100);
         const elapsed = Date.now() - startTimeRef.current;
-        setLockProgress(100);
         const points = count * 2;
         setTimeout(() => onCompleteRef.current(points, elapsed), 600);
       } else {
         lockedCountRef.current = count;
         setLockedCount(count);
+        lockProgressRef.current = 0;
         setLockProgress(0);
-        setTarget(spawnTarget(count));
+        const newTarget = spawnTarget(count);
+        setTarget(newTarget);
+        targetRef.current = newTarget;
       }
     } else {
       setAttempts((a) => a + 1);
     }
-  }, [target, locked, lockedCount, spawnTarget]);
+  }, [target, locked, spawnTarget]);
 
   return (
     <div className="space-y-3">
