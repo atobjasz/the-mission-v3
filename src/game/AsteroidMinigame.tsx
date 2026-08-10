@@ -253,7 +253,7 @@ export default function AsteroidMinigame({ onComplete, onAbort }: Props) {
       </div>
 
       <div
-        className="relative w-full flex-1 min-h-0 rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-radial from-coffee-900/30 to-black/50"
+        className="relative w-full h-[240px] sm:h-[300px] lg:flex-1 lg:h-auto lg:min-h-0 rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-radial from-coffee-900/30 to-black/50"
         style={{
           backgroundImage:
             'linear-gradient(rgba(196,164,132,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(196,164,132,0.07) 1px, transparent 1px), radial-gradient(circle at 50% 50%, rgba(196,164,132,0.08) 0%, transparent 60%)',

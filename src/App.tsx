@@ -562,7 +562,7 @@ export default function App() {
 
           {/* Two-column layout with shatter animation */}
           <div
-            className={`grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4 h-[calc(100vh-110px)] lg:h-[calc(100vh-200px)] grid-rows-[140px_1fr] lg:grid-rows-1 ${
+            className={`grid grid-cols-1 lg:grid-cols-2 gap-2 sm:gap-4 h-[calc(100vh-110px)] lg:h-[calc(100vh-200px)] grid-rows-[180px_1fr] lg:grid-rows-1 ${
               hijackPhase === 'shattering' ? 'shatter-container' : ''
             }`}
           >

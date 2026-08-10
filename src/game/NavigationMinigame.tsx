@@ -182,7 +182,7 @@ export default function NavigationMinigame({ onComplete, onAbort }: Props) {
       </div>
       <div
         id="nav-field"
-        className="relative w-full flex-1 min-h-0 rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-to-br from-coffee-900/40 to-black/40"
+        className="relative w-full h-[240px] sm:h-[300px] lg:flex-1 lg:h-auto lg:min-h-0 rounded-xl overflow-hidden border border-coffee-400/20 bg-gradient-to-br from-coffee-900/40 to-black/40"
         style={{
           backgroundImage:
             'linear-gradient(rgba(196,164,132,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(196,164,132,0.06) 1px, transparent 1px)',

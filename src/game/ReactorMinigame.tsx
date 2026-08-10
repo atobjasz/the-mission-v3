@@ -149,7 +149,7 @@ export default function ReactorMinigame({ onComplete, onAbort }: Props) {
           Round {Math.min(visibleLen, TARGET_LENGTH)} / {TARGET_LENGTH}
         </span>
       </div>
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 flex-1 min-h-0 content-center">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 place-content-center h-[240px] sm:h-[300px] lg:flex-1 lg:h-auto lg:min-h-0">
         {Array.from({ length: NUM_TILES }, (_, i) => {
           const isActive = activeTile === i;
           const canPress = phase === 'input';
@@ -161,9 +161,8 @@ export default function ReactorMinigame({ onComplete, onAbort }: Props) {
               onClick={() => handlePress(i)}
               disabled={!canPress}
               className={`
-                relative rounded-xl font-display font-bold text-2xl sm:text-3xl
+                relative aspect-square rounded-xl font-display font-bold text-2xl sm:text-3xl
                 transition-all duration-150 select-none flex items-center justify-center
-                w-full h-full min-h-0
                 ${isActive ? 'scale-105 shadow-lg' : canPress ? 'hover:scale-105 cursor-pointer' : 'cursor-default'}
               `}
               style={{
